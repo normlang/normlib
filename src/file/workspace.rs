@@ -31,3 +31,12 @@ impl Metadata {
         Ok(Metadata {})
     }
 }
+
+pub fn create(name: &str) -> std::io::Result<()> {
+    fs::create_dir(name)?;
+
+    let dot_workspace = String::from(name) + "/.workspace";
+    fs::create_dir(dot_workspace)?;
+
+    Ok(())
+}

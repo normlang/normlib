@@ -58,3 +58,22 @@ impl Metadata {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn create_normspace() {
+        let tmp_dir = tempdir().unwrap();
+        let root = tmp_dir.path().join("ns");
+
+        let normspace = Normspace::create(&root).unwrap();
+        let dot_dir = root.join(Normspace::DOT_DIR_NAME);
+
+        assert!(root.is_dir());
+        assert!(dot_dir.is_dir());
+        assert_eq!(normspace.path, dot_dir);
+    }
+}

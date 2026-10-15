@@ -6,4 +6,5 @@ edition = "2024"
 description = "Common lib for Norm tools"
 repository = "https://github.com/krre/normlib"
 
-[dependencies]
+[dev-dependencies]
+tempfile = "3.27.0"

@@ -1,7 +1,6 @@
 use std::{
     fs,
     path::{Path, PathBuf},
-    str::FromStr,
 };
 
 pub struct Normspace {
@@ -12,14 +11,14 @@ pub struct Normspace {
 impl Normspace {
     pub const DOT_DIR_NAME: &'static str = ".normspace";
 
-    pub fn create(name: &str) -> std::io::Result<Normspace> {
-        fs::create_dir(name)?;
+    pub fn create(path: impl AsRef<Path>) -> std::io::Result<Normspace> {
+        let root = path.as_ref();
+        fs::create_dir(root)?;
 
-        let dot_dir_path = String::from(name) + "/" + Normspace::DOT_DIR_NAME;
+        let dot_dir_path = root.join(Normspace::DOT_DIR_NAME);
         fs::create_dir(&dot_dir_path)?;
 
-        let path = PathBuf::from_str(&dot_dir_path).expect("normspace path should be exists");
-        let normspace = Normspace::new(path.as_path())?;
+        let normspace = Normspace::new(&dot_dir_path)?;
         normspace.save()?;
 
         Ok(normspace)

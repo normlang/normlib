@@ -37,7 +37,7 @@ impl Metadata {
 pub fn create(name: &str) -> std::io::Result<()> {
     fs::create_dir(name)?;
 
-    let dot_dir_path = String::from(name) + "/.workspace";
+    let dot_dir_path = String::from(name) + "/" + DOT_DIR_NAME;
     fs::create_dir(dot_dir_path)?;
 
     Ok(())

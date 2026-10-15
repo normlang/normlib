@@ -3,17 +3,19 @@ use std::{
     path::{Path, PathBuf},
 };
 
+pub const DOT_DIR_NAME: &'static str = ".workspace";
+
 pub struct Workspace {
     metadata: Metadata,
 }
 
 impl Workspace {
     pub fn new(path: &Path) -> Result<Self, std::io::Error> {
-        let dot_workspace: PathBuf = path.join(".workspace");
-        fs::create_dir(dot_workspace.as_path())?;
+        let dot_dir_path: PathBuf = path.join(DOT_DIR_NAME);
+        fs::create_dir(dot_dir_path.as_path())?;
 
         Ok(Self {
-            metadata: Metadata::new(dot_workspace.as_path())?,
+            metadata: Metadata::new(dot_dir_path.as_path())?,
         })
     }
 
@@ -35,8 +37,8 @@ impl Metadata {
 pub fn create(name: &str) -> std::io::Result<()> {
     fs::create_dir(name)?;
 
-    let dot_workspace = String::from(name) + "/.workspace";
-    fs::create_dir(dot_workspace)?;
+    let dot_dir_path = String::from(name) + "/.workspace";
+    fs::create_dir(dot_dir_path)?;
 
     Ok(())
 }

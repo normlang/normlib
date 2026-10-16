@@ -75,5 +75,8 @@ mod tests {
         assert!(root.is_dir());
         assert!(dot_dir.is_dir());
         assert_eq!(normspace.path, dot_dir);
+
+        let meta_file = dot_dir.join(Metadata::NAME);
+        assert!(meta_file.is_file());
     }
 }

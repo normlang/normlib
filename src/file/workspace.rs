@@ -58,3 +58,25 @@ impl Metadata {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tempfile::tempdir;
+
+    #[test]
+    fn create_workspace() {
+        let tmp_dir = tempdir().unwrap();
+        let root = tmp_dir.path().join("ws");
+
+        let workspace = Workspace::create(&root).unwrap();
+        let dot_dir = root.join(Workspace::DOT_DIR_NAME);
+
+        assert!(root.is_dir());
+        assert!(dot_dir.is_dir());
+        assert_eq!(workspace.path, dot_dir);
+
+        let meta_file = dot_dir.join(Metadata::NAME);
+        assert!(meta_file.is_file());
+    }
+}

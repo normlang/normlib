@@ -1,5 +1,6 @@
 use std::{
-    fs,
+    fs::{self, File},
+    io::{BufWriter, Write},
     path::{Path, PathBuf},
 };
 
@@ -47,6 +48,8 @@ pub struct Metadata {
 
 impl Metadata {
     pub const NAME: &'static str = "metadata";
+    pub const MAGIC: &[u8; 8] = b"\xb3\xff\xca\x01\xf3\xc7\x64\x9d";
+    pub const VERSION: u16 = 1;
 
     pub fn new(capacity: u8) -> Self {
         Metadata {
@@ -55,10 +58,14 @@ impl Metadata {
     }
 
     pub fn save(&self, path: &Path) -> Result<(), std::io::Error> {
-        let bytes: Vec<u8> = Vec::new();
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Metadata::NAME);
-        fs::write(metadata_path.as_path(), bytes)?;
+
+        let mut w = BufWriter::new(File::create(metadata_path)?);
+        w.write_all(Metadata::MAGIC)?;
+        w.write_all(&Metadata::VERSION.to_le_bytes())?;
+        w.flush()?;
+
         Ok(())
     }
 }

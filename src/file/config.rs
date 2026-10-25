@@ -28,7 +28,7 @@ impl Config {
         Ok(config)
     }
 
-    pub fn new(path: &Path) -> Result<Self, std::io::Error> {
+    pub fn new(path: &Path) -> std::io::Result<Self> {
         Ok(Self {
             _path: path.to_path_buf(),
             _normspaces: Vec::new(),

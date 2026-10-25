@@ -29,7 +29,7 @@ impl Normspace {
         Ok(normspace)
     }
 
-    pub fn new(path: &Path) -> Result<Self, std::io::Error> {
+    pub fn new(path: &Path) -> std::io::Result<Self> {
         Ok(Self {
             path: path.to_path_buf(),
             metadata: Metadata::new(),
@@ -40,7 +40,7 @@ impl Normspace {
         &self.metadata
     }
 
-    pub fn write(&self) -> Result<(), std::io::Error> {
+    pub fn write(&self) -> std::io::Result<()> {
         self.metadata.write(&self.path)?;
         Ok(())
     }
@@ -57,7 +57,7 @@ impl Metadata {
         Self {}
     }
 
-    pub fn write(&self, path: &Path) -> Result<(), std::io::Error> {
+    pub fn write(&self, path: &Path) -> std::io::Result<()> {
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Self::NAME);
 

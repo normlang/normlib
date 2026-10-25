@@ -19,7 +19,7 @@ impl Workspace {
         fs::create_dir(&dot_dir_path)?;
 
         let workspace = Workspace::new(&dot_dir_path)?;
-        workspace.save()?;
+        workspace.write()?;
 
         Ok(workspace)
     }
@@ -35,8 +35,8 @@ impl Workspace {
         &self.metadata
     }
 
-    pub fn save(&self) -> Result<(), std::io::Error> {
-        self.metadata.save(&self.path)?;
+    pub fn write(&self) -> Result<(), std::io::Error> {
+        self.metadata.write(&self.path)?;
         Ok(())
     }
 }
@@ -50,7 +50,7 @@ impl Metadata {
         Metadata {}
     }
 
-    pub fn save(&self, path: &Path) -> Result<(), std::io::Error> {
+    pub fn write(&self, path: &Path) -> Result<(), std::io::Error> {
         let bytes: Vec<u8> = Vec::new();
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Metadata::NAME);

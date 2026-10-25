@@ -20,7 +20,7 @@ impl Normspace {
         fs::create_dir(&dot_dir_path)?;
 
         let normspace = Normspace::new(&dot_dir_path)?;
-        normspace.save()?;
+        normspace.write()?;
 
         Ok(normspace)
     }
@@ -36,8 +36,8 @@ impl Normspace {
         &self.metadata
     }
 
-    pub fn save(&self) -> Result<(), std::io::Error> {
-        self.metadata.save(&self.path)?;
+    pub fn write(&self) -> Result<(), std::io::Error> {
+        self.metadata.write(&self.path)?;
         Ok(())
     }
 }
@@ -53,7 +53,7 @@ impl Metadata {
         Metadata {}
     }
 
-    pub fn save(&self, path: &Path) -> Result<(), std::io::Error> {
+    pub fn write(&self, path: &Path) -> Result<(), std::io::Error> {
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Metadata::NAME);
 

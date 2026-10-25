@@ -12,14 +12,14 @@ pub struct Normspace {
 impl Normspace {
     pub const DOT_DIR_NAME: &'static str = ".normspace";
 
-    pub fn create(path: impl AsRef<Path>) -> std::io::Result<Normspace> {
+    pub fn create(path: impl AsRef<Path>) -> std::io::Result<Self> {
         let root = path.as_ref();
         fs::create_dir(root)?;
 
-        let dot_dir_path = root.join(Normspace::DOT_DIR_NAME);
+        let dot_dir_path = root.join(Self::DOT_DIR_NAME);
         fs::create_dir(&dot_dir_path)?;
 
-        let normspace = Normspace::new(&dot_dir_path)?;
+        let normspace = Self::new(&dot_dir_path)?;
         normspace.write()?;
 
         Ok(normspace)
@@ -50,16 +50,16 @@ impl Metadata {
     pub const VERSION: u16 = 1;
 
     pub fn new() -> Self {
-        Metadata {}
+        Self {}
     }
 
     pub fn write(&self, path: &Path) -> Result<(), std::io::Error> {
         let mut metadata_path = path.to_path_buf();
-        metadata_path.push(Metadata::NAME);
+        metadata_path.push(Self::NAME);
 
         let mut w = BufWriter::new(File::create(metadata_path)?);
-        w.write_all(Metadata::MAGIC)?;
-        w.write_all(&Metadata::VERSION.to_le_bytes())?;
+        w.write_all(Self::MAGIC)?;
+        w.write_all(&Self::VERSION.to_le_bytes())?;
         w.flush()?;
 
         Ok(())

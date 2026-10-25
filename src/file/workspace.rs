@@ -11,14 +11,14 @@ pub struct Workspace {
 impl Workspace {
     pub const DOT_DIR_NAME: &'static str = ".workspace";
 
-    pub fn create(path: impl AsRef<Path>) -> std::io::Result<Workspace> {
+    pub fn create(path: impl AsRef<Path>) -> std::io::Result<Self> {
         let root = path.as_ref();
         fs::create_dir(root)?;
 
-        let dot_dir_path = root.join(Workspace::DOT_DIR_NAME);
+        let dot_dir_path = root.join(Self::DOT_DIR_NAME);
         fs::create_dir(&dot_dir_path)?;
 
-        let workspace = Workspace::new(&dot_dir_path)?;
+        let workspace = Self::new(&dot_dir_path)?;
         workspace.write()?;
 
         Ok(workspace)
@@ -47,13 +47,13 @@ impl Metadata {
     pub const NAME: &'static str = "metadata";
 
     pub fn new() -> Self {
-        Metadata {}
+        Self {}
     }
 
     pub fn write(&self, path: &Path) -> Result<(), std::io::Error> {
         let bytes: Vec<u8> = Vec::new();
         let mut metadata_path = path.to_path_buf();
-        metadata_path.push(Metadata::NAME);
+        metadata_path.push(Self::NAME);
         fs::write(metadata_path.as_path(), bytes)?;
         Ok(())
     }

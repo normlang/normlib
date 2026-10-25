@@ -4,6 +4,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use crate::file::config::Config;
+
 pub struct Normspace {
     path: PathBuf,
     metadata: Metadata,
@@ -13,6 +15,8 @@ impl Normspace {
     pub const DOT_DIR_NAME: &'static str = ".normspace";
 
     pub fn create(path: impl AsRef<Path>) -> std::io::Result<Self> {
+        let _ = Config::create(None);
+
         let root = path.as_ref();
         fs::create_dir(root)?;
 

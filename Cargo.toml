@@ -8,3 +8,6 @@ repository = "https://github.com/krre/normlib"
 
 [dev-dependencies]
 tempfile = "3.27.0"
+
+[dependencies]
+dirs = "7.0.0"

@@ -1,5 +1,6 @@
 use std::{
-    fs, io,
+    fs::{self, File},
+    io::{self, BufWriter, Write},
     path::{Path, PathBuf},
 };
 
@@ -7,8 +8,7 @@ use crate::{core::Id, file::normspace::Normspace};
 
 pub struct Config {
     _path: PathBuf,
-    _normspaces: Vec<Normspace>,
-    _last_normspace_id: Id,
+    metadata: Metadata,
 }
 
 impl Config {
@@ -33,11 +33,44 @@ impl Config {
         Ok(norm_config_dir)
     }
 
+    pub fn metadata(&self) -> &Metadata {
+        &self.metadata
+    }
+
     pub fn new(path: &Path) -> io::Result<Self> {
         Ok(Self {
             _path: path.to_path_buf(),
+            metadata: Metadata::new(),
+        })
+    }
+}
+
+pub struct Metadata {
+    _normspaces: Vec<Normspace>,
+    _last_normspace_id: Id,
+}
+
+impl Metadata {
+    pub const NAME: &'static str = "metadata";
+    pub const MAGIC: &[u8; 8] = b"\x5a\xe1\x0c\x93\x7f\xd4\x28\xb6";
+    pub const VERSION: u16 = 1;
+
+    pub fn new() -> Self {
+        Self {
             _normspaces: Vec::new(),
             _last_normspace_id: Id::default(),
-        })
+        }
+    }
+
+    pub fn write(&self, path: &Path) -> io::Result<()> {
+        let mut metadata_path = path.to_path_buf();
+        metadata_path.push(Self::NAME);
+
+        let mut w = BufWriter::new(File::create(metadata_path)?);
+        w.write_all(Self::MAGIC)?;
+        w.write_all(&Self::VERSION.to_le_bytes())?;
+        w.flush()?;
+
+        Ok(())
     }
 }

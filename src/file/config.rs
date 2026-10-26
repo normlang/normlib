@@ -3,11 +3,12 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::file::normspace::Normspace;
+use crate::{core::Id, file::normspace::Normspace};
 
 pub struct Config {
     _path: PathBuf,
     _normspaces: Vec<Normspace>,
+    _last_normspace_id: Id,
 }
 
 impl Config {
@@ -32,6 +33,7 @@ impl Config {
         Ok(Self {
             _path: path.to_path_buf(),
             _normspaces: Vec::new(),
+            _last_normspace_id: Id::default(),
         })
     }
 }

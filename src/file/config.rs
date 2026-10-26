@@ -15,6 +15,12 @@ impl Config {
     pub const DIR_NAME: &'static str = "norm";
 
     pub fn create(path: Option<&Path>) -> std::io::Result<Self> {
+        let config_dir = Self::create_config_dir(path)?;
+        let config = Self::new(&config_dir)?;
+        Ok(config)
+    }
+
+    fn create_config_dir(path: Option<&Path>) -> std::io::Result<PathBuf> {
         let user_config_dir = match path {
             Some(p) => p.to_path_buf(),
             None => dirs::config_dir().ok_or_else(|| {
@@ -23,10 +29,8 @@ impl Config {
         };
 
         let norm_config_dir = user_config_dir.join(Self::DIR_NAME);
-
         fs::create_dir(&norm_config_dir)?;
-        let config = Self::new(&norm_config_dir)?;
-        Ok(config)
+        Ok(norm_config_dir)
     }
 
     pub fn new(path: &Path) -> std::io::Result<Self> {

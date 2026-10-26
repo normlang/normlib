@@ -1,5 +1,6 @@
 use std::{
-    fs, io,
+    fs::{self, File},
+    io::{self, BufWriter, Write},
     path::{Path, PathBuf},
 };
 
@@ -45,16 +46,22 @@ pub struct Metadata {}
 
 impl Metadata {
     pub const NAME: &'static str = "metadata";
+    pub const MAGIC: &[u8; 8] = b"\x2f\x8b\xd1\x46\xa0\x73\xe9\x1c";
+    pub const VERSION: u16 = 1;
 
     pub fn new() -> Self {
         Self {}
     }
 
     pub fn write(&self, path: &Path) -> io::Result<()> {
-        let bytes: Vec<u8> = Vec::new();
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Self::NAME);
-        fs::write(metadata_path.as_path(), bytes)?;
+
+        let mut w = BufWriter::new(File::create(metadata_path)?);
+        w.write_all(Self::MAGIC)?;
+        w.write_all(&Self::VERSION.to_le_bytes())?;
+        w.flush()?;
+
         Ok(())
     }
 }

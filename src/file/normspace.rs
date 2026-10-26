@@ -1,6 +1,6 @@
 use std::{
     fs::{self, File},
-    io::{BufWriter, Write},
+    io::{self, BufWriter, Write},
     path::{Path, PathBuf},
 };
 
@@ -14,7 +14,7 @@ pub struct Normspace {
 impl Normspace {
     pub const DOT_DIR_NAME: &'static str = ".normspace";
 
-    pub fn create(path: impl AsRef<Path>) -> std::io::Result<Self> {
+    pub fn create(path: impl AsRef<Path>) -> io::Result<Self> {
         let _ = Config::create(None);
 
         let root = path.as_ref();
@@ -29,7 +29,7 @@ impl Normspace {
         Ok(normspace)
     }
 
-    pub fn new(path: &Path) -> std::io::Result<Self> {
+    pub fn new(path: &Path) -> io::Result<Self> {
         Ok(Self {
             path: path.to_path_buf(),
             metadata: Metadata::new(),
@@ -40,7 +40,7 @@ impl Normspace {
         &self.metadata
     }
 
-    pub fn write(&self) -> std::io::Result<()> {
+    pub fn write(&self) -> io::Result<()> {
         self.metadata.write(&self.path)?;
         Ok(())
     }
@@ -57,7 +57,7 @@ impl Metadata {
         Self {}
     }
 
-    pub fn write(&self, path: &Path) -> std::io::Result<()> {
+    pub fn write(&self, path: &Path) -> io::Result<()> {
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Self::NAME);
 

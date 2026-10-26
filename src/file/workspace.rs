@@ -1,5 +1,5 @@
 use std::{
-    fs,
+    fs, io,
     path::{Path, PathBuf},
 };
 
@@ -11,7 +11,7 @@ pub struct Workspace {
 impl Workspace {
     pub const DOT_DIR_NAME: &'static str = ".workspace";
 
-    pub fn create(path: impl AsRef<Path>) -> std::io::Result<Self> {
+    pub fn create(path: impl AsRef<Path>) -> io::Result<Self> {
         let root = path.as_ref();
         fs::create_dir(root)?;
 
@@ -24,7 +24,7 @@ impl Workspace {
         Ok(workspace)
     }
 
-    pub fn new(path: &Path) -> std::io::Result<Self> {
+    pub fn new(path: &Path) -> io::Result<Self> {
         Ok(Self {
             path: path.to_path_buf(),
             metadata: Metadata::new(),
@@ -35,7 +35,7 @@ impl Workspace {
         &self.metadata
     }
 
-    pub fn write(&self) -> std::io::Result<()> {
+    pub fn write(&self) -> io::Result<()> {
         self.metadata.write(&self.path)?;
         Ok(())
     }
@@ -50,7 +50,7 @@ impl Metadata {
         Self {}
     }
 
-    pub fn write(&self, path: &Path) -> std::io::Result<()> {
+    pub fn write(&self, path: &Path) -> io::Result<()> {
         let bytes: Vec<u8> = Vec::new();
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Self::NAME);

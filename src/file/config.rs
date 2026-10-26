@@ -1,5 +1,5 @@
 use std::{
-    fs,
+    fs, io,
     path::{Path, PathBuf},
 };
 
@@ -14,17 +14,17 @@ pub struct Config {
 impl Config {
     pub const DIR_NAME: &'static str = "norm";
 
-    pub fn create(path: Option<&Path>) -> std::io::Result<Self> {
+    pub fn create(path: Option<&Path>) -> io::Result<Self> {
         let config_dir = Self::create_config_dir(path)?;
         let config = Self::new(&config_dir)?;
         Ok(config)
     }
 
-    fn create_config_dir(path: Option<&Path>) -> std::io::Result<PathBuf> {
+    fn create_config_dir(path: Option<&Path>) -> io::Result<PathBuf> {
         let user_config_dir = match path {
             Some(p) => p.to_path_buf(),
             None => dirs::config_dir().ok_or_else(|| {
-                std::io::Error::new(std::io::ErrorKind::NotFound, "user config dir not found")
+                io::Error::new(io::ErrorKind::NotFound, "user config dir not found")
             })?,
         };
 
@@ -33,7 +33,7 @@ impl Config {
         Ok(norm_config_dir)
     }
 
-    pub fn new(path: &Path) -> std::io::Result<Self> {
+    pub fn new(path: &Path) -> io::Result<Self> {
         Ok(Self {
             _path: path.to_path_buf(),
             _normspaces: Vec::new(),

@@ -1,5 +1,5 @@
 use std::{
-    fs,
+    fs, io,
     path::{Path, PathBuf},
 };
 
@@ -21,7 +21,7 @@ impl Project {
         path: impl AsRef<Path>,
         name: &str,
         target: Target,
-    ) -> Result<Project, std::io::Error> {
+    ) -> Result<Project, io::Error> {
         let file_name = path.as_ref().join(name.to_string() + ".norm");
         println!("filename {}", file_name.to_str().unwrap());
 
@@ -42,7 +42,7 @@ impl Project {
     }
 }
 
-pub fn build() -> std::io::Result<()> {
+pub fn build() -> io::Result<()> {
     if !fs::exists(Project::BUILD_DIR)? {
         fs::create_dir(Project::BUILD_DIR)?;
     }
@@ -50,7 +50,7 @@ pub fn build() -> std::io::Result<()> {
     Ok(())
 }
 
-pub fn run() -> std::io::Result<()> {
+pub fn run() -> io::Result<()> {
     println!("Application runned...");
     Ok(())
 }

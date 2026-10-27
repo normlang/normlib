@@ -1,14 +1,25 @@
 use std::{
-    fs::{self, File},
-    io::{self, BufWriter, Write},
+    fs, io,
     path::{Path, PathBuf},
 };
 
-use crate::file::config::Config;
+use crate::{
+    core::Id,
+    file::{
+        config::Config,
+        metadata::{Metadata, Payload},
+        workspace::Workspace,
+    },
+};
 
 pub struct Normspace {
     path: PathBuf,
-    metadata: Metadata,
+    metadata: Metadata<NormspaceData>,
+}
+
+struct NormspaceData {
+    workspaces: Vec<Workspace>,
+    _last_workspace_id: Id,
 }
 
 impl Normspace {
@@ -30,14 +41,15 @@ impl Normspace {
     }
 
     pub fn new(path: &Path) -> io::Result<Self> {
+        let data = NormspaceData {
+            workspaces: Vec::new(),
+            _last_workspace_id: Id::default(),
+        };
+
         Ok(Self {
             path: path.to_path_buf(),
-            metadata: Metadata::new(),
+            metadata: Metadata::new(data),
         })
-    }
-
-    pub fn metadata(&self) -> &Metadata {
-        &self.metadata
     }
 
     pub fn write(&self) -> io::Result<()> {
@@ -46,27 +58,21 @@ impl Normspace {
     }
 }
 
-pub struct Metadata {}
-
-impl Metadata {
-    pub const NAME: &'static str = "metadata";
-    pub const MAGIC: &[u8; 8] = b"\xb3\xff\xca\x01\xf3\xc7\x64\x9d";
-    pub const VERSION: u16 = 1;
-
-    pub fn new() -> Self {
-        Self {}
+impl Payload for NormspaceData {
+    fn version(&self) -> u16 {
+        1
     }
 
-    pub fn write(&self, path: &Path) -> io::Result<()> {
-        let mut metadata_path = path.to_path_buf();
-        metadata_path.push(Self::NAME);
+    fn magic(&self) -> [u8; 8] {
+        [0xb3, 0xff, 0xca, 0x01, 0xf3, 0xc7, 0x64, 0x9d]
+    }
 
-        let mut w = BufWriter::new(File::create(metadata_path)?);
-        w.write_all(Self::MAGIC)?;
-        w.write_all(&Self::VERSION.to_le_bytes())?;
-        w.flush()?;
+    fn serialize(&self) -> &[u8] {
+        &[]
+    }
 
-        Ok(())
+    fn deserialize(&self, bytes: &[u8]) {
+        todo!()
     }
 }
 
@@ -85,8 +91,5 @@ mod tests {
         assert!(root.is_dir());
         assert!(dot_dir.is_dir());
         assert_eq!(normspace.path, dot_dir);
-
-        let meta_file = dot_dir.join(Metadata::NAME);
-        assert!(meta_file.is_file());
     }
 }

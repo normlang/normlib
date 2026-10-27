@@ -1,14 +1,24 @@
 use std::{
-    fs::{self, File},
-    io::{self, BufWriter, Write},
+    fs, io,
     path::{Path, PathBuf},
 };
 
-use crate::{core::Id, file::normspace::Normspace};
+use crate::{
+    core::Id,
+    file::{
+        metadata::{Metadata, Payload},
+        normspace::Normspace,
+    },
+};
 
 pub struct Config {
     _path: PathBuf,
-    metadata: Metadata,
+    metadata: Metadata<ConfigData>,
+}
+
+struct ConfigData {
+    normspaces: Vec<Normspace>,
+    _last_normspace_id: Id,
 }
 
 impl Config {
@@ -17,6 +27,7 @@ impl Config {
     pub fn create(path: Option<&Path>) -> io::Result<Self> {
         let config_dir = Self::create_config_dir(path)?;
         let config = Self::new(&config_dir)?;
+        config.metadata.write(&config_dir)?;
         Ok(config)
     }
 
@@ -33,44 +44,33 @@ impl Config {
         Ok(norm_config_dir)
     }
 
-    pub fn metadata(&self) -> &Metadata {
-        &self.metadata
-    }
-
     pub fn new(path: &Path) -> io::Result<Self> {
+        let data = ConfigData {
+            normspaces: Vec::new(),
+            _last_normspace_id: Id::default(),
+        };
+
         Ok(Self {
             _path: path.to_path_buf(),
-            metadata: Metadata::new(),
+            metadata: Metadata::new(data),
         })
     }
 }
 
-pub struct Metadata {
-    _normspaces: Vec<Normspace>,
-    _last_normspace_id: Id,
-}
-
-impl Metadata {
-    pub const NAME: &'static str = "metadata";
-    pub const MAGIC: &[u8; 8] = b"\x5a\xe1\x0c\x93\x7f\xd4\x28\xb6";
-    pub const VERSION: u16 = 1;
-
-    pub fn new() -> Self {
-        Self {
-            _normspaces: Vec::new(),
-            _last_normspace_id: Id::default(),
-        }
+impl Payload for ConfigData {
+    fn version(&self) -> u16 {
+        1
     }
 
-    pub fn write(&self, path: &Path) -> io::Result<()> {
-        let mut metadata_path = path.to_path_buf();
-        metadata_path.push(Self::NAME);
+    fn magic(&self) -> [u8; 8] {
+        [0x5a, 0xe1, 0x0c, 0x93, 0x7f, 0xd4, 0x28, 0xb6]
+    }
 
-        let mut w = BufWriter::new(File::create(metadata_path)?);
-        w.write_all(Self::MAGIC)?;
-        w.write_all(&Self::VERSION.to_le_bytes())?;
-        w.flush()?;
+    fn serialize(&self) -> &[u8] {
+        &[]
+    }
 
-        Ok(())
+    fn deserialize(&self, bytes: &[u8]) {
+        todo!()
     }
 }

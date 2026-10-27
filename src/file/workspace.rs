@@ -1,12 +1,24 @@
 use std::{
-    fs::{self, File},
-    io::{self, BufWriter, Write},
+    fs, io,
     path::{Path, PathBuf},
+};
+
+use crate::{
+    core::Id,
+    file::{
+        metadata::{Metadata, Payload},
+        project::Project,
+    },
 };
 
 pub struct Workspace {
     path: PathBuf,
-    metadata: Metadata,
+    metadata: Metadata<WorkspaceData>,
+}
+
+struct WorkspaceData {
+    projects: Vec<Project>,
+    _last_project_id: Id,
 }
 
 impl Workspace {
@@ -26,14 +38,15 @@ impl Workspace {
     }
 
     pub fn new(path: &Path) -> io::Result<Self> {
+        let data = WorkspaceData {
+            projects: Vec::new(),
+            _last_project_id: Id::default(),
+        };
+
         Ok(Self {
             path: path.to_path_buf(),
-            metadata: Metadata::new(),
+            metadata: Metadata::new(data),
         })
-    }
-
-    pub fn metadata(&self) -> &Metadata {
-        &self.metadata
     }
 
     pub fn write(&self) -> io::Result<()> {
@@ -42,27 +55,21 @@ impl Workspace {
     }
 }
 
-pub struct Metadata {}
-
-impl Metadata {
-    pub const NAME: &'static str = "metadata";
-    pub const MAGIC: &[u8; 8] = b"\x2f\x8b\xd1\x46\xa0\x73\xe9\x1c";
-    pub const VERSION: u16 = 1;
-
-    pub fn new() -> Self {
-        Self {}
+impl Payload for WorkspaceData {
+    fn version(&self) -> u16 {
+        1
     }
 
-    pub fn write(&self, path: &Path) -> io::Result<()> {
-        let mut metadata_path = path.to_path_buf();
-        metadata_path.push(Self::NAME);
+    fn magic(&self) -> [u8; 8] {
+        [0xb3, 0x2f, 0x8b, 0xd1, 0x46, 0xa0, 0x73, 0x1c]
+    }
 
-        let mut w = BufWriter::new(File::create(metadata_path)?);
-        w.write_all(Self::MAGIC)?;
-        w.write_all(&Self::VERSION.to_le_bytes())?;
-        w.flush()?;
+    fn serialize(&self) -> &[u8] {
+        &[]
+    }
 
-        Ok(())
+    fn deserialize(&self, bytes: &[u8]) {
+        todo!()
     }
 }
 
@@ -82,8 +89,5 @@ mod tests {
         assert!(root.is_dir());
         assert!(dot_dir.is_dir());
         assert_eq!(workspace.path, dot_dir);
-
-        let meta_file = dot_dir.join(Metadata::NAME);
-        assert!(meta_file.is_file());
     }
 }

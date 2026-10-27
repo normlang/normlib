@@ -12,7 +12,7 @@ use crate::{
 };
 
 pub struct Config {
-    _path: PathBuf,
+    path: PathBuf,
     metadata: Metadata<ConfigData>,
 }
 
@@ -27,7 +27,7 @@ impl Config {
     pub fn create(path: Option<&Path>) -> io::Result<Self> {
         let config_dir = Self::create_config_dir(path)?;
         let config = Self::new(&config_dir)?;
-        config.metadata.write(&config_dir)?;
+        config.write()?;
         Ok(config)
     }
 
@@ -51,9 +51,14 @@ impl Config {
         };
 
         Ok(Self {
-            _path: path.to_path_buf(),
+            path: path.to_path_buf(),
             metadata: Metadata::new(data),
         })
+    }
+
+    pub fn write(&self) -> io::Result<()> {
+        self.metadata.write(&self.path)?;
+        Ok(())
     }
 }
 

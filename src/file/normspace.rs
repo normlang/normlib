@@ -19,7 +19,6 @@ pub struct Normspace {
 
 struct NormspaceData {
     workspaces: Vec<Workspace>,
-    _last_workspace_id: Id,
 }
 
 impl Normspace {
@@ -43,7 +42,6 @@ impl Normspace {
     pub fn new(path: &Path) -> io::Result<Self> {
         let data = NormspaceData {
             workspaces: Vec::new(),
-            _last_workspace_id: Id::default(),
         };
 
         Ok(Self {

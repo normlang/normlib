@@ -18,7 +18,6 @@ pub struct Config {
 
 struct ConfigData {
     normspaces: Vec<Normspace>,
-    _last_normspace_id: Id,
 }
 
 impl Config {
@@ -47,7 +46,6 @@ impl Config {
     pub fn new(path: &Path) -> io::Result<Self> {
         let data = ConfigData {
             normspaces: Vec::new(),
-            _last_normspace_id: Id::default(),
         };
 
         Ok(Self {

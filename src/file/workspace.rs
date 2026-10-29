@@ -18,7 +18,6 @@ pub struct Workspace {
 
 struct WorkspaceData {
     projects: Vec<Project>,
-    _last_project_id: Id,
 }
 
 impl Workspace {
@@ -40,7 +39,6 @@ impl Workspace {
     pub fn new(path: &Path) -> io::Result<Self> {
         let data = WorkspaceData {
             projects: Vec::new(),
-            _last_project_id: Id::default(),
         };
 
         Ok(Self {

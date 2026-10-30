@@ -38,7 +38,7 @@ impl<P: Payload> Metadata<P> {
         w.write_all(&Self::VERSION.to_le_bytes())?;
         w.write_all(&self.last_id.get().to_le_bytes())?;
         w.write_all(&self.payload.version().to_le_bytes())?;
-        w.write(&self.payload.serialize())?;
+        w.write_all(&self.payload.serialize())?;
         w.flush()?;
 
         Ok(())

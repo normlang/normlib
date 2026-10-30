@@ -57,12 +57,10 @@ impl Normspace {
 }
 
 impl Payload for NormspaceData {
+    const MAGIC: [u8; 8] = [0xb3, 0xff, 0xca, 0x01, 0xf3, 0xc7, 0x64, 0x9d];
+
     fn version(&self) -> u16 {
         1
-    }
-
-    fn magic(&self) -> [u8; 8] {
-        [0xb3, 0xff, 0xca, 0x01, 0xf3, 0xc7, 0x64, 0x9d]
     }
 
     fn serialize(&self) -> &[u8] {

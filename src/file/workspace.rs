@@ -54,12 +54,10 @@ impl Workspace {
 }
 
 impl Payload for WorkspaceData {
+    const MAGIC: [u8; 8] = [0xb3, 0x2f, 0x8b, 0xd1, 0x46, 0xa0, 0x73, 0x1c];
+
     fn version(&self) -> u16 {
         1
-    }
-
-    fn magic(&self) -> [u8; 8] {
-        [0xb3, 0x2f, 0x8b, 0xd1, 0x46, 0xa0, 0x73, 0x1c]
     }
 
     fn serialize(&self) -> &[u8] {

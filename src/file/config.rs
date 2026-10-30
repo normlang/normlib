@@ -62,10 +62,7 @@ impl Config {
 
 impl Payload for ConfigData {
     const MAGIC: [u8; 8] = [0x5a, 0xe1, 0x0c, 0x93, 0x7f, 0xd4, 0x28, 0xb6];
-
-    fn version(&self) -> u16 {
-        1
-    }
+    const VERSION: u16 = 1;
 
     fn serialize(&self) -> &[u8] {
         &[]

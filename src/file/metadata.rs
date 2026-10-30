@@ -8,8 +8,8 @@ use crate::core::Id;
 
 pub trait Payload {
     const MAGIC: [u8; 8];
+    const VERSION: u16;
 
-    fn version(&self) -> u16;
     fn serialize(&self) -> &[u8];
     fn deserialize(&self, bytes: &[u8]);
 }
@@ -38,7 +38,7 @@ impl<P: Payload> Metadata<P> {
         w.write_all(&P::MAGIC)?;
         w.write_all(&Self::VERSION.to_le_bytes())?;
         w.write_all(&self.last_id.get().to_le_bytes())?;
-        w.write_all(&self.payload.version().to_le_bytes())?;
+        w.write_all(&P::VERSION.to_le_bytes())?;
         w.write_all(&self.payload.serialize())?;
         w.flush()?;
 

@@ -3,13 +3,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{
-    core::Id,
-    file::{
-        config::Config,
-        metadata::{Metadata, Payload},
-        workspace::Workspace,
-    },
+use crate::file::{
+    config::Config,
+    metadata::{Metadata, Payload},
+    workspace::Workspace,
 };
 
 pub struct Normspace {
@@ -64,7 +61,7 @@ impl Payload for NormspaceData {
         &[]
     }
 
-    fn deserialize(bytes: &[u8]) -> io::Result<Self> {
+    fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
         todo!();
     }
 }

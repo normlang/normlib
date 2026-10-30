@@ -3,12 +3,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{
-    core::Id,
-    file::{
-        metadata::{Metadata, Payload},
-        normspace::Normspace,
-    },
+use crate::file::{
+    metadata::{Metadata, Payload},
+    normspace::Normspace,
 };
 
 pub struct Config {
@@ -68,7 +65,7 @@ impl Payload for ConfigData {
         &[]
     }
 
-    fn deserialize(bytes: &[u8]) -> io::Result<Self> {
+    fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
         todo!();
     }
 }

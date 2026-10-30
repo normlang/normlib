@@ -1,6 +1,6 @@
 use std::{
     fs::File,
-    io::{self, BufWriter, Write},
+    io::{self, BufReader, BufWriter, Read, Write},
     path::Path,
 };
 
@@ -11,7 +11,7 @@ pub trait Payload: Sized {
     const VERSION: u16;
 
     fn serialize(&self) -> &[u8];
-    fn deserialize(bytes: &[u8]) -> io::Result<Self>;
+    fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self>;
 }
 
 pub struct Metadata<P: Payload> {
@@ -43,5 +43,46 @@ impl<P: Payload> Metadata<P> {
         w.flush()?;
 
         Ok(())
+    }
+
+    pub fn read(path: &Path) -> io::Result<Self> {
+        let mut metadata_path = path.to_path_buf();
+        metadata_path.push(Self::NAME);
+
+        let mut r = BufReader::new(File::open(metadata_path)?);
+
+        let mut magic = [0u8; 8];
+        r.read_exact(&mut magic)?;
+
+        if magic != P::MAGIC {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "wrong metadata magic",
+            ));
+        }
+
+        let mut b2 = [0u8; 2];
+        r.read_exact(&mut b2)?;
+        let version = u16::from_le_bytes(b2);
+
+        if version != Self::VERSION {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidData,
+                "wrong metadata version",
+            ));
+        }
+
+        let mut b8 = [0u8; 8];
+        r.read_exact(&mut b8)?;
+        let last_id = Id::new(u64::from_le_bytes(b8));
+
+        r.read_exact(&mut b2)?;
+        let payload_version = u16::from_le_bytes(b2);
+
+        let mut bytes = Vec::new();
+        r.read_to_end(&mut bytes)?;
+        let payload = P::deserialize(payload_version, &bytes)?;
+
+        Ok(Self { last_id, payload })
     }
 }

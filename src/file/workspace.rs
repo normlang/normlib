@@ -3,12 +3,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{
-    core::Id,
-    file::{
-        metadata::{Metadata, Payload},
-        project::Project,
-    },
+use crate::file::{
+    metadata::{Metadata, Payload},
+    project::Project,
 };
 
 pub struct Workspace {
@@ -61,7 +58,7 @@ impl Payload for WorkspaceData {
         &[]
     }
 
-    fn deserialize(bytes: &[u8]) -> io::Result<Self> {
+    fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
         todo!();
     }
 }

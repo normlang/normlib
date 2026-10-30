@@ -68,7 +68,7 @@ impl Payload for ConfigData {
         &[]
     }
 
-    fn deserialize(&self, bytes: &[u8]) {
-        todo!()
+    fn deserialize(bytes: &[u8]) -> io::Result<Self> {
+        todo!();
     }
 }

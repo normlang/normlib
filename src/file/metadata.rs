@@ -6,12 +6,12 @@ use std::{
 
 use crate::core::Id;
 
-pub trait Payload {
+pub trait Payload: Sized {
     const MAGIC: [u8; 8];
     const VERSION: u16;
 
     fn serialize(&self) -> &[u8];
-    fn deserialize(&self, bytes: &[u8]);
+    fn deserialize(bytes: &[u8]) -> io::Result<Self>;
 }
 
 pub struct Metadata<P: Payload> {

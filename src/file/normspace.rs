@@ -1,12 +1,15 @@
 use std::{
-    fs, io,
+    env, fs, io,
     path::{Path, PathBuf},
 };
 
-use crate::file::{
-    config::Config,
-    metadata::{Metadata, Payload},
-    workspace::Workspace,
+use crate::{
+    core::Id,
+    file::{
+        config::Config,
+        metadata::{Metadata, Payload},
+        workspace::Workspace,
+    },
 };
 
 pub struct Normspace {
@@ -15,34 +18,32 @@ pub struct Normspace {
 }
 
 struct NormspaceData {
+    id: Id,
     workspaces: Vec<Workspace>,
 }
 
 impl Normspace {
     pub const DOT_DIR_NAME: &'static str = ".normspace";
 
-    pub fn create(path: impl AsRef<Path>) -> io::Result<Self> {
+    pub fn add(name: &str) -> io::Result<Id> {
         let mut config = Config::new()?;
-
-        let root = path.as_ref();
-        fs::create_dir(root)?;
-
-        let dot_dir_path = root.join(Self::DOT_DIR_NAME);
-        fs::create_dir(&dot_dir_path)?;
-
-        let normspace = Self::new(&dot_dir_path)?;
-        normspace.write()?;
-
-        Ok(normspace)
+        let dir = env::current_dir()?;
+        config.add_normspace(name, &dir)
     }
 
-    pub fn new(path: &Path) -> io::Result<Self> {
+    pub fn with_path(path: &Path, id: Id) -> io::Result<Self> {
+        fs::create_dir(path)?;
+
+        let dot_dir_path = path.join(Self::DOT_DIR_NAME);
+        fs::create_dir(&dot_dir_path)?;
+
         let data = NormspaceData {
+            id,
             workspaces: Vec::new(),
         };
 
-        Ok(Self {
-            path: path.to_path_buf(),
+        Ok(Normspace {
+            path: dot_dir_path,
             metadata: Metadata::new(data),
         })
     }
@@ -62,7 +63,10 @@ impl Payload for NormspaceData {
     }
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
-        todo!();
+        Ok(NormspaceData {
+            id: Id::default(),
+            workspaces: Vec::new(),
+        })
     }
 }
 
@@ -75,11 +79,11 @@ mod tests {
     fn create_normspace() {
         let tmp_dir = tempdir().unwrap();
         let root = tmp_dir.path().join("ns");
-        let normspace = Normspace::create(&root).unwrap();
+        let normspace = Normspace::with_path(&root, Id::new(42)).unwrap();
         let dot_dir = root.join(Normspace::DOT_DIR_NAME);
 
         assert!(root.is_dir());
         assert!(dot_dir.is_dir());
-        assert_eq!(normspace.path, dot_dir);
+        assert_eq!(normspace.path, root);
     }
 }

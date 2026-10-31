@@ -3,9 +3,12 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::file::{
-    metadata::{Metadata, Payload},
-    normspace::Normspace,
+use crate::{
+    core::Id,
+    file::{
+        metadata::{Metadata, Payload},
+        normspace::Normspace,
+    },
 };
 
 pub struct Config {
@@ -37,7 +40,7 @@ impl Config {
                 normspaces: Vec::new(),
             };
             let config = Config {
-                path: path.to_path_buf(),
+                path: norm_config_dir,
                 metadata: Metadata::new(data),
             };
             config.write()?;
@@ -61,6 +64,16 @@ impl Config {
             metadata,
         })
     }
+
+    pub fn add_normspace(&mut self, name: &str, dir: &Path) -> io::Result<Id> {
+        let path = dir.join(name);
+        let id = self.metadata.next_id();
+        let normspace = Normspace::with_path(&path, id)?;
+        normspace.write()?;
+        self.metadata.payload_mut().normspaces.push(normspace);
+        self.write()?;
+        Ok(id)
+    }
 }
 
 impl Payload for ConfigData {
@@ -72,6 +85,8 @@ impl Payload for ConfigData {
     }
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
-        todo!();
+        Ok(ConfigData {
+            normspaces: Vec::new(),
+        })
     }
 }

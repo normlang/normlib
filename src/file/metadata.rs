@@ -10,7 +10,7 @@ pub trait Payload: Sized {
     const MAGIC: [u8; 8];
     const VERSION: u16;
 
-    fn serialize(&self) -> &[u8];
+    fn serialize(&self) -> io::Result<Vec<u8>>;
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self>;
 }
 
@@ -39,7 +39,7 @@ impl<P: Payload> Metadata<P> {
         w.write_all(&Self::VERSION.to_le_bytes())?;
         w.write_all(&self.last_id.get().to_le_bytes())?;
         w.write_all(&P::VERSION.to_le_bytes())?;
-        w.write_all(&self.payload.serialize())?;
+        w.write_all(&self.payload.serialize()?)?;
         w.flush()?;
 
         Ok(())

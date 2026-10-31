@@ -58,8 +58,8 @@ impl Payload for NormspaceData {
     const MAGIC: [u8; 8] = [0xb3, 0xff, 0xca, 0x01, 0xf3, 0xc7, 0x64, 0x9d];
     const VERSION: u16 = 1;
 
-    fn serialize(&self) -> &[u8] {
-        &[]
+    fn serialize(&self) -> io::Result<Vec<u8>> {
+        Ok(Vec::new())
     }
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {

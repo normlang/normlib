@@ -93,4 +93,9 @@ impl<P: Payload> Metadata<P> {
     pub fn payload_mut(&mut self) -> &mut P {
         &mut self.payload
     }
+
+    pub fn next_id(&mut self) -> Id {
+        self.last_id = self.last_id.increment();
+        self.last_id
+    }
 }

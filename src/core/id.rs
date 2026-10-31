@@ -9,4 +9,8 @@ impl Id {
     pub const fn get(self) -> u64 {
         self.0
     }
+
+    pub fn increment(&self) -> Self {
+        Self(self.0 + 1)
+    }
 }

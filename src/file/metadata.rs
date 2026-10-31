@@ -85,4 +85,12 @@ impl<P: Payload> Metadata<P> {
 
         Ok(Self { last_id, payload })
     }
+
+    pub fn payload(&self) -> &P {
+        &self.payload
+    }
+
+    pub fn payload_mut(&mut self) -> &mut P {
+        &mut self.payload
+    }
 }

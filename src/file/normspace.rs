@@ -22,7 +22,7 @@ impl Normspace {
     pub const DOT_DIR_NAME: &'static str = ".normspace";
 
     pub fn create(path: impl AsRef<Path>) -> io::Result<Self> {
-        let _ = Config::create(None);
+        let mut config = Config::new()?;
 
         let root = path.as_ref();
         fs::create_dir(root)?;

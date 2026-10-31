@@ -20,40 +20,46 @@ struct ConfigData {
 impl Config {
     pub const DIR_NAME: &'static str = "norm";
 
-    pub fn create(path: Option<&Path>) -> io::Result<Self> {
-        let config_dir = Self::create_config_dir(path)?;
-        let config = Self::new(&config_dir)?;
-        config.write()?;
-        Ok(config)
+    pub fn new() -> io::Result<Self> {
+        let user_config_dir = dirs::config_dir().ok_or_else(|| {
+            io::Error::new(io::ErrorKind::NotFound, "invalid user config directory")
+        })?;
+
+        Ok(Self::with_path(&user_config_dir)?)
     }
 
-    fn create_config_dir(path: Option<&Path>) -> io::Result<PathBuf> {
-        let user_config_dir = match path {
-            Some(p) => p.to_path_buf(),
-            None => dirs::config_dir().ok_or_else(|| {
-                io::Error::new(io::ErrorKind::NotFound, "user config dir not found")
-            })?,
+    pub fn with_path(path: &Path) -> io::Result<Self> {
+        let norm_config_dir = path.join(Self::DIR_NAME);
+
+        let norm_config = if !norm_config_dir.exists() {
+            fs::create_dir(&norm_config_dir)?;
+            let data = ConfigData {
+                normspaces: Vec::new(),
+            };
+            let config = Config {
+                path: path.to_path_buf(),
+                metadata: Metadata::new(data),
+            };
+            config.write()?;
+            config
+        } else {
+            Self::read_from_path(&norm_config_dir)?
         };
 
-        let norm_config_dir = user_config_dir.join(Self::DIR_NAME);
-        fs::create_dir(&norm_config_dir)?;
-        Ok(norm_config_dir)
-    }
-
-    pub fn new(path: &Path) -> io::Result<Self> {
-        let data = ConfigData {
-            normspaces: Vec::new(),
-        };
-
-        Ok(Self {
-            path: path.to_path_buf(),
-            metadata: Metadata::new(data),
-        })
+        Ok(norm_config)
     }
 
     pub fn write(&self) -> io::Result<()> {
         self.metadata.write(&self.path)?;
         Ok(())
+    }
+
+    fn read_from_path(path: &Path) -> io::Result<Self> {
+        let metadata = Metadata::read(path)?;
+        Ok(Config {
+            path: path.to_path_buf(),
+            metadata,
+        })
     }
 }
 

@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    core::Id,
+    core::Id16,
     file::{
         config::Config,
         metadata::{Metadata, Payload},
@@ -18,20 +18,20 @@ pub struct Normspace {
 }
 
 struct NormspaceData {
-    id: Id,
+    id: Id16,
     workspaces: Vec<Workspace>,
 }
 
 impl Normspace {
     pub const DOT_DIR_NAME: &'static str = ".normspace";
 
-    pub fn add(name: &str) -> io::Result<Id> {
+    pub fn add(name: &str) -> io::Result<Id16> {
         let mut config = Config::new()?;
         let dir = env::current_dir()?;
         config.add_normspace(name, &dir)
     }
 
-    pub fn with_path(path: &Path, id: Id) -> io::Result<Self> {
+    pub fn with_path(path: &Path, id: Id16) -> io::Result<Self> {
         fs::create_dir(path)?;
 
         let dot_dir_path = path.join(Self::DOT_DIR_NAME);
@@ -64,7 +64,7 @@ impl Payload for NormspaceData {
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
         Ok(NormspaceData {
-            id: Id::default(),
+            id: Id16::default(),
             workspaces: Vec::new(),
         })
     }
@@ -79,7 +79,7 @@ mod tests {
     fn create_normspace() {
         let tmp_dir = tempdir().unwrap();
         let root = tmp_dir.path().join("ns");
-        let normspace = Normspace::with_path(&root, Id::new(42)).unwrap();
+        let normspace = Normspace::with_path(&root, Id16::new(42)).unwrap();
         let dot_dir = root.join(Normspace::DOT_DIR_NAME);
 
         assert!(root.is_dir());

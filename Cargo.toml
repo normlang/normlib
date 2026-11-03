@@ -11,3 +11,4 @@ tempfile = "3.27.0"
 
 [dependencies]
 dirs = "7.0.0"
+num-traits = "0.2.19"

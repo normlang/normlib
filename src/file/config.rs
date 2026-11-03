@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    core::Id,
+    core::Id16,
     file::{
         metadata::{Metadata, Payload},
         normspace::Normspace,
@@ -65,9 +65,9 @@ impl Config {
         })
     }
 
-    pub fn add_normspace(&mut self, name: &str, dir: &Path) -> io::Result<Id> {
+    pub fn add_normspace(&mut self, name: &str, dir: &Path) -> io::Result<Id16> {
         let path = dir.join(name);
-        let id = self.metadata.next_id();
+        let id = self.metadata.next_id().ok_or(io::ErrorKind::InvalidData)?;
         let normspace = Normspace::with_path(&path, id)?;
         normspace.write()?;
         self.metadata.payload_mut().normspaces.push(normspace);

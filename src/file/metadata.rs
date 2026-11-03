@@ -4,7 +4,7 @@ use std::{
     path::Path,
 };
 
-use crate::core::Id;
+use crate::core::Id16;
 
 pub trait Payload: Sized {
     const MAGIC: [u8; 8];
@@ -15,7 +15,7 @@ pub trait Payload: Sized {
 }
 
 pub struct Metadata<P: Payload> {
-    last_id: Id,
+    last_id: Id16,
     payload: P,
 }
 
@@ -25,7 +25,7 @@ impl<P: Payload> Metadata<P> {
 
     pub fn new(payload: P) -> Self {
         Self {
-            last_id: Id::default(),
+            last_id: Id16::default(),
             payload,
         }
     }
@@ -72,9 +72,9 @@ impl<P: Payload> Metadata<P> {
             ));
         }
 
-        let mut b8 = [0u8; 8];
+        let mut b8 = [0u8; 2];
         r.read_exact(&mut b8)?;
-        let last_id = Id::new(u64::from_le_bytes(b8));
+        let last_id = Id16::new(u16::from_le_bytes(b8));
 
         r.read_exact(&mut b2)?;
         let payload_version = u16::from_le_bytes(b2);
@@ -94,8 +94,9 @@ impl<P: Payload> Metadata<P> {
         &mut self.payload
     }
 
-    pub fn next_id(&mut self) -> Id {
-        self.last_id = self.last_id.increment();
-        self.last_id
+    pub fn next_id(&mut self) -> Option<Id16> {
+        let last_id = self.last_id.increment()?;
+        self.last_id = last_id;
+        Some(self.last_id)
     }
 }

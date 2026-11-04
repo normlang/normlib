@@ -13,10 +13,10 @@ use crate::{
 
 pub struct Config {
     path: PathBuf,
-    metadata: Metadata<ConfigData>,
+    metadata: Metadata<ConfigMeta>,
 }
 
-struct ConfigData {
+struct ConfigMeta {
     normspaces: Vec<Normspace>,
 }
 
@@ -36,7 +36,7 @@ impl Config {
 
         let norm_config = if !norm_config_dir.exists() {
             fs::create_dir(&norm_config_dir)?;
-            let data = ConfigData {
+            let data = ConfigMeta {
                 normspaces: Vec::new(),
             };
             let config = Config {
@@ -76,7 +76,7 @@ impl Config {
     }
 }
 
-impl Payload for ConfigData {
+impl Payload for ConfigMeta {
     const MAGIC: [u8; 8] = [0x5a, 0xe1, 0x0c, 0x93, 0x7f, 0xd4, 0x28, 0xb6];
     const VERSION: u16 = 1;
 
@@ -85,7 +85,7 @@ impl Payload for ConfigData {
     }
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
-        Ok(ConfigData {
+        Ok(ConfigMeta {
             normspaces: Vec::new(),
         })
     }

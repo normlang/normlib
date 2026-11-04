@@ -14,10 +14,10 @@ use crate::{
 
 pub struct Normspace {
     path: PathBuf,
-    metadata: Metadata<NormspaceData>,
+    metadata: Metadata<NormspaceMeta>,
 }
 
-struct NormspaceData {
+struct NormspaceMeta {
     id: Id16,
     workspaces: Vec<Workspace>,
 }
@@ -37,7 +37,7 @@ impl Normspace {
         let dot_dir_path = path.join(Self::DOT_DIR_NAME);
         fs::create_dir(&dot_dir_path)?;
 
-        let data = NormspaceData {
+        let data = NormspaceMeta {
             id,
             workspaces: Vec::new(),
         };
@@ -54,7 +54,7 @@ impl Normspace {
     }
 }
 
-impl Payload for NormspaceData {
+impl Payload for NormspaceMeta {
     const MAGIC: [u8; 8] = [0xb3, 0xff, 0xca, 0x01, 0xf3, 0xc7, 0x64, 0x9d];
     const VERSION: u16 = 1;
 
@@ -63,7 +63,7 @@ impl Payload for NormspaceData {
     }
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
-        Ok(NormspaceData {
+        Ok(NormspaceMeta {
             id: Id16::default(),
             workspaces: Vec::new(),
         })

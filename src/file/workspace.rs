@@ -10,10 +10,10 @@ use crate::file::{
 
 pub struct Workspace {
     path: PathBuf,
-    metadata: Metadata<WorkspaceData>,
+    metadata: Metadata<WorkspaceMeta>,
 }
 
-struct WorkspaceData {
+struct WorkspaceMeta {
     projects: Vec<Project>,
 }
 
@@ -34,7 +34,7 @@ impl Workspace {
     }
 
     pub fn new(path: &Path) -> io::Result<Self> {
-        let data = WorkspaceData {
+        let data = WorkspaceMeta {
             projects: Vec::new(),
         };
 
@@ -50,7 +50,7 @@ impl Workspace {
     }
 }
 
-impl Payload for WorkspaceData {
+impl Payload for WorkspaceMeta {
     const MAGIC: [u8; 8] = [0xb3, 0x2f, 0x8b, 0xd1, 0x46, 0xa0, 0x73, 0x1c];
     const VERSION: u16 = 1;
 

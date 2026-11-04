@@ -17,7 +17,13 @@ pub struct Config {
 }
 
 struct ConfigMeta {
-    normspaces: Vec<Normspace>,
+    normspaces: Vec<NormspaceMeta>,
+}
+
+struct NormspaceMeta {
+    id: Id16,
+    name: String,
+    path: PathBuf,
 }
 
 impl Config {
@@ -65,13 +71,24 @@ impl Config {
         })
     }
 
-    pub fn add_normspace(&mut self, name: &str, dir: &Path) -> io::Result<Id16> {
-        let path = dir.join(name);
+    pub fn new_normspace(&mut self, name: &str, dir: &Path) -> io::Result<Id16> {
         let id = self.metadata.next_id().ok_or(io::ErrorKind::InvalidData)?;
-        let normspace = Normspace::with_path(&path, id)?;
+        let file_name = format!("ns!{:04X}", id.get());
+        let path = dir.join(file_name);
+        fs::create_dir(&path)?;
+
+        let normspace = Normspace::with_path(&path)?;
         normspace.write()?;
-        self.metadata.payload_mut().normspaces.push(normspace);
+
+        let normspace_meta = NormspaceMeta {
+            id,
+            name: String::from(name),
+            path,
+        };
+
+        self.metadata.payload_mut().normspaces.push(normspace_meta);
         self.write()?;
+
         Ok(id)
     }
 }

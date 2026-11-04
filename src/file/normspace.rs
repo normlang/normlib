@@ -18,7 +18,6 @@ pub struct Normspace {
 }
 
 struct NormspaceMeta {
-    id: Id16,
     workspaces: Vec<Workspace>,
 }
 
@@ -28,17 +27,14 @@ impl Normspace {
     pub fn add(name: &str) -> io::Result<Id16> {
         let mut config = Config::new()?;
         let dir = env::current_dir()?;
-        config.add_normspace(name, &dir)
+        config.new_normspace(name, &dir)
     }
 
-    pub fn with_path(path: &Path, id: Id16) -> io::Result<Self> {
-        fs::create_dir(path)?;
-
+    pub fn with_path(path: &Path) -> io::Result<Self> {
         let dot_dir_path = path.join(Self::DOT_DIR_NAME);
         fs::create_dir(&dot_dir_path)?;
 
         let data = NormspaceMeta {
-            id,
             workspaces: Vec::new(),
         };
 
@@ -64,7 +60,6 @@ impl Payload for NormspaceMeta {
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
         Ok(NormspaceMeta {
-            id: Id16::default(),
             workspaces: Vec::new(),
         })
     }
@@ -79,7 +74,7 @@ mod tests {
     fn create_normspace() {
         let tmp_dir = tempdir().unwrap();
         let root = tmp_dir.path().join("ns");
-        let normspace = Normspace::with_path(&root, Id16::new(42)).unwrap();
+        let normspace = Normspace::with_path(&root).unwrap();
         let dot_dir = root.join(Normspace::DOT_DIR_NAME);
 
         assert!(root.is_dir());

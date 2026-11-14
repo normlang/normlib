@@ -18,11 +18,11 @@ pub struct Config {
     metadata: Metadata<ConfigMeta>,
 }
 
-struct ConfigMeta {
+pub struct ConfigMeta {
     normspaces: Vec<NormspaceMeta>,
 }
 
-struct NormspaceMeta {
+pub struct NormspaceMeta {
     id: Id16,
     name: String,
     path: PathBuf,
@@ -92,6 +92,10 @@ impl Config {
         self.write()?;
 
         Ok(id)
+    }
+
+    pub fn normspaces(&self) -> &[NormspaceMeta] {
+        &self.metadata.payload().normspaces
     }
 }
 

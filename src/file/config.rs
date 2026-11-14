@@ -1,6 +1,8 @@
 use std::{
-    fs, io,
+    fs,
+    io::{self, Cursor, Read},
     path::{Path, PathBuf},
+    str::FromStr,
 };
 
 use crate::{
@@ -98,12 +100,62 @@ impl Payload for ConfigMeta {
     const VERSION: u16 = 1;
 
     fn serialize(&self) -> io::Result<Vec<u8>> {
-        Ok(Vec::new())
+        let mut result: Vec<u8> = Vec::new();
+        let size = self.normspaces.len() as u16;
+        result.append(&mut size.to_le_bytes().to_vec());
+
+        for normspace in self.normspaces.iter() {
+            result.append(&mut normspace.id.get().to_le_bytes().to_vec());
+
+            let name_size = normspace.name.len() as u16;
+            result.append(&mut name_size.to_le_bytes().to_vec());
+            result.append(&mut normspace.name.as_bytes().to_vec());
+
+            let path = normspace.path.to_str().unwrap_or_default();
+            let path_size = path.len() as u16;
+            result.append(&mut path_size.to_le_bytes().to_vec());
+            result.append(&mut path.as_bytes().to_vec());
+        }
+
+        Ok(result)
     }
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
-        Ok(ConfigMeta {
-            normspaces: Vec::new(),
-        })
+        _ = version;
+
+        let mut cur = Cursor::new(bytes);
+        let mut size_buff = [0u8; 2];
+        cur.read_exact(&mut size_buff)?;
+        let size = u16::from_le_bytes(size_buff);
+
+        let mut normspaces: Vec<NormspaceMeta> = Vec::new();
+
+        for _ in 0..size {
+            let mut id_buf = [0u8; 2];
+            cur.read_exact(&mut id_buf)?;
+            let id = Id16::new(u16::from_be_bytes(id_buf));
+
+            let mut name_size_buf = [0u8; 2];
+            cur.read_exact(&mut name_size_buf)?;
+            let name_size = u16::from_be_bytes(name_size_buf);
+            let mut name_buf = vec![0u8; name_size as usize];
+            cur.read_exact(&mut name_buf)?;
+            let name = String::from_utf8(name_buf)
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+
+            let mut path_size_buf = [0u8; 2];
+            cur.read_exact(&mut path_size_buf)?;
+            let path_size = u16::from_be_bytes(path_size_buf);
+            let mut path_buf = vec![0u8; path_size as usize];
+            cur.read_exact(&mut path_buf)?;
+            let path_str = String::from_utf8(path_buf)
+                .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
+            let path = PathBuf::from_str(&path_str).unwrap_or_default();
+
+            let normspace = NormspaceMeta { id, name, path };
+            normspaces.push(normspace);
+        }
+
+        Ok(ConfigMeta { normspaces })
     }
 }

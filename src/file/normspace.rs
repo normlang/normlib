@@ -30,6 +30,21 @@ impl Normspace {
         config.new_normspace(name, &dir)
     }
 
+    pub fn list() -> io::Result<()> {
+        let config = Config::new()?;
+
+        for normspace in config.normspaces() {
+            println!(
+                "{:04X} {} {}",
+                normspace.id.get(),
+                normspace.name,
+                normspace.path.to_str().unwrap_or_default()
+            );
+        }
+
+        Ok(())
+    }
+
     pub fn with_path(path: &Path) -> io::Result<Self> {
         let dot_dir_path = path.join(Self::DOT_DIR_NAME);
         fs::create_dir(&dot_dir_path)?;

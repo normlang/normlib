@@ -23,9 +23,9 @@ pub struct ConfigMeta {
 }
 
 pub struct NormspaceMeta {
-    id: Id16,
-    name: String,
-    path: PathBuf,
+    pub id: Id16,
+    pub name: String,
+    pub path: PathBuf,
 }
 
 impl Config {

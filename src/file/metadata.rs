@@ -49,10 +49,10 @@ impl<P: Payload> Metadata<P> {
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Self::NAME);
 
-        let mut r = BufReader::new(File::open(metadata_path)?);
+        let mut reader = BufReader::new(File::open(metadata_path)?);
 
         let mut magic = [0u8; 8];
-        r.read_exact(&mut magic)?;
+        reader.read_exact(&mut magic)?;
 
         if magic != P::MAGIC {
             return Err(io::Error::new(
@@ -61,9 +61,9 @@ impl<P: Payload> Metadata<P> {
             ));
         }
 
-        let mut b2 = [0u8; 2];
-        r.read_exact(&mut b2)?;
-        let version = u16::from_le_bytes(b2);
+        let mut version_buf = [0u8; 2];
+        reader.read_exact(&mut version_buf)?;
+        let version = u16::from_le_bytes(version_buf);
 
         if version != Self::VERSION {
             return Err(io::Error::new(
@@ -72,16 +72,16 @@ impl<P: Payload> Metadata<P> {
             ));
         }
 
-        let mut b8 = [0u8; 2];
-        r.read_exact(&mut b8)?;
-        let last_id = Id16::new(u16::from_le_bytes(b8));
+        let mut last_id_buf = [0u8; 2];
+        reader.read_exact(&mut last_id_buf)?;
+        let last_id = Id16::new(u16::from_le_bytes(last_id_buf));
 
-        r.read_exact(&mut b2)?;
-        let payload_version = u16::from_le_bytes(b2);
+        reader.read_exact(&mut version_buf)?;
+        let payload_version = u16::from_le_bytes(version_buf);
 
-        let mut bytes = Vec::new();
-        r.read_to_end(&mut bytes)?;
-        let payload = P::deserialize(payload_version, &bytes)?;
+        let mut payload_buf = Vec::new();
+        reader.read_to_end(&mut payload_buf)?;
+        let payload = P::deserialize(payload_version, &payload_buf)?;
 
         Ok(Self { last_id, payload })
     }

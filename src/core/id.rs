@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use num_traits::{CheckedAdd, One, Unsigned};
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -19,5 +21,11 @@ impl<T: Unsigned + Copy + CheckedAdd + One> Id<T> {
 
     pub fn increment(&self) -> Option<Self> {
         self.0.checked_add(&T::one()).map(Self)
+    }
+}
+
+impl<T: Unsigned + Display> Display for Id<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
     }
 }

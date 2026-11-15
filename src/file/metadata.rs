@@ -61,7 +61,7 @@ impl<P: Payload> Metadata<P> {
             ));
         }
 
-        let mut version_buf = [0u8; 2];
+        let mut version_buf = [0u8; size_of::<u16>()];
         reader.read_exact(&mut version_buf)?;
         let version = u16::from_le_bytes(version_buf);
 
@@ -72,7 +72,7 @@ impl<P: Payload> Metadata<P> {
             ));
         }
 
-        let mut last_id_buf = [0u8; 2];
+        let mut last_id_buf = [0u8; size_of::<Id16>()];
         reader.read_exact(&mut last_id_buf)?;
         let last_id = Id16::new(u16::from_le_bytes(last_id_buf));
 

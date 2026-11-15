@@ -128,18 +128,18 @@ impl Payload for ConfigMeta {
         _ = version;
 
         let mut cur = Cursor::new(bytes);
-        let mut size_buff = [0u8; 2];
+        let mut size_buff = [0u8; size_of::<u16>()];
         cur.read_exact(&mut size_buff)?;
         let size = u16::from_le_bytes(size_buff);
 
         let mut normspaces: Vec<NormspaceMeta> = Vec::new();
 
         for _ in 0..size {
-            let mut id_buf = [0u8; 2];
+            let mut id_buf = [0u8; size_of::<Id16>()];
             cur.read_exact(&mut id_buf)?;
             let id = Id16::new(u16::from_be_bytes(id_buf));
 
-            let mut name_size_buf = [0u8; 2];
+            let mut name_size_buf = [0u8; size_of::<u16>()];
             cur.read_exact(&mut name_size_buf)?;
             let name_size = u16::from_be_bytes(name_size_buf);
             let mut name_buf = vec![0u8; name_size as usize];
@@ -147,7 +147,7 @@ impl Payload for ConfigMeta {
             let name = String::from_utf8(name_buf)
                 .map_err(|e| std::io::Error::new(std::io::ErrorKind::InvalidData, e))?;
 
-            let mut path_size_buf = [0u8; 2];
+            let mut path_size_buf = [0u8; size_of::<u16>()];
             cur.read_exact(&mut path_size_buf)?;
             let path_size = u16::from_be_bytes(path_size_buf);
             let mut path_buf = vec![0u8; path_size as usize];

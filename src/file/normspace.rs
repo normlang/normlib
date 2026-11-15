@@ -36,7 +36,7 @@ impl Normspace {
         for normspace in config.normspaces() {
             println!(
                 "{:04X} {} {}",
-                normspace.id.get(),
+                normspace.id,
                 normspace.name,
                 normspace.path.to_str().unwrap_or_default()
             );

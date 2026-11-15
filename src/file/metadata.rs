@@ -95,8 +95,7 @@ impl<P: Payload> Metadata<P> {
     }
 
     pub fn next_id(&mut self) -> Option<Id16> {
-        let last_id = self.last_id.increment()?;
-        self.last_id = last_id;
+        self.last_id = self.last_id.increment()?;
         Some(self.last_id)
     }
 }

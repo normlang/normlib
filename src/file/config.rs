@@ -103,7 +103,7 @@ impl Payload for ConfigMeta {
     const MAGIC: [u8; 8] = [0x5a, 0xe1, 0x0c, 0x93, 0x7f, 0xd4, 0x28, 0xb6];
     const VERSION: u16 = 1;
 
-    fn serialize(&self) -> io::Result<Vec<u8>> {
+    fn serialize(&self) -> Vec<u8> {
         let mut result: Vec<u8> = Vec::new();
         let size = self.normspaces.len() as u16;
         result.append(&mut size.to_le_bytes().to_vec());
@@ -121,7 +121,7 @@ impl Payload for ConfigMeta {
             result.append(&mut path.as_bytes().to_vec());
         }
 
-        Ok(result)
+        result
     }
 
     fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {

@@ -1,6 +1,8 @@
 use std::fmt::{Display, UpperHex};
 
-use num_traits::{CheckedAdd, One, Unsigned};
+use num_traits::{CheckedAdd, One, ToBytes, Unsigned};
+
+use crate::file::codec::ser::Serialize;
 
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Id<T: Unsigned>(T);
@@ -33,5 +35,15 @@ impl<T: Unsigned + Display> Display for Id<T> {
 impl<T: Unsigned + Display> UpperHex for Id<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.0.fmt(f)
+    }
+}
+
+impl<T> Serialize for Id<T>
+where
+    T: Unsigned + ToBytes,
+    <T as ToBytes>::Bytes: AsRef<[u8]>,
+{
+    fn serialize(&self, buf: &mut Vec<u8>) {
+        buf.extend_from_slice(self.0.to_le_bytes().as_ref());
     }
 }

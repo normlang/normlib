@@ -4,7 +4,7 @@ use std::{
     path::Path,
 };
 
-use crate::core::Id16;
+use crate::{core::Id16, file::codec::ser::Serialize};
 
 pub trait Payload: Sized {
     const MAGIC: [u8; 8];
@@ -34,11 +34,14 @@ impl<P: Payload> Metadata<P> {
         let mut metadata_path = path.to_path_buf();
         metadata_path.push(Self::NAME);
 
+        let mut buf: Vec<u8> = Vec::new();
+        Self::VERSION.serialize(&mut buf);
+        self.last_id.serialize(&mut buf);
+        P::VERSION.serialize(&mut buf);
+
         let mut w = BufWriter::new(File::create(metadata_path)?);
         w.write_all(&P::MAGIC)?;
-        w.write_all(&Self::VERSION.to_le_bytes())?;
-        w.write_all(&self.last_id.get().to_le_bytes())?;
-        w.write_all(&P::VERSION.to_le_bytes())?;
+        w.write_all(&buf)?;
         w.write_all(&self.payload.serialize())?;
         w.flush()?;
 

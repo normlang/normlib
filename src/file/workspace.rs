@@ -14,7 +14,7 @@ pub struct Workspace {
 }
 
 struct WorkspaceMeta {
-    projects: Vec<Project>,
+    _projects: Vec<Project>,
 }
 
 impl Workspace {
@@ -35,7 +35,7 @@ impl Workspace {
 
     pub fn new(path: &Path) -> io::Result<Self> {
         let data = WorkspaceMeta {
-            projects: Vec::new(),
+            _projects: Vec::new(),
         };
 
         Ok(Self {
@@ -58,7 +58,7 @@ impl Payload for WorkspaceMeta {
         Vec::new()
     }
 
-    fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
+    fn deserialize(_version: u16, _bytes: &[u8]) -> io::Result<Self> {
         todo!();
     }
 }

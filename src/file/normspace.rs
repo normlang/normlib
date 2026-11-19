@@ -18,7 +18,7 @@ pub struct Normspace {
 }
 
 struct NormspaceMeta {
-    workspaces: Vec<Workspace>,
+    _workspaces: Vec<Workspace>,
 }
 
 impl Normspace {
@@ -50,7 +50,7 @@ impl Normspace {
         fs::create_dir(&dot_dir_path)?;
 
         let data = NormspaceMeta {
-            workspaces: Vec::new(),
+            _workspaces: Vec::new(),
         };
 
         Ok(Normspace {
@@ -73,9 +73,9 @@ impl Payload for NormspaceMeta {
         Vec::new()
     }
 
-    fn deserialize(version: u16, bytes: &[u8]) -> io::Result<Self> {
+    fn deserialize(_version: u16, _bytes: &[u8]) -> io::Result<Self> {
         Ok(NormspaceMeta {
-            workspaces: Vec::new(),
+            _workspaces: Vec::new(),
         })
     }
 }

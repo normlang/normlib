@@ -8,6 +8,7 @@ use std::{
 use crate::{
     core::Id16,
     file::{
+        codec::ser::Serialize,
         metadata::{Metadata, Payload},
         normspace::Normspace,
     },
@@ -109,11 +110,8 @@ impl Payload for ConfigMeta {
         result.append(&mut size.to_le_bytes().to_vec());
 
         for normspace in self.normspaces.iter() {
-            result.append(&mut normspace.id.get().to_le_bytes().to_vec());
-
-            let name_size = normspace.name.len() as u16;
-            result.append(&mut name_size.to_le_bytes().to_vec());
-            result.append(&mut normspace.name.as_bytes().to_vec());
+            normspace.id.serialize(&mut result);
+            normspace.name.serialize(&mut result);
 
             let path = normspace.path.to_str().unwrap_or_default();
             let path_size = path.len() as u16;

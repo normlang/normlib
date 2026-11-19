@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 pub trait Serialize {
     fn serialize(&self, buf: &mut Vec<u8>);
 }
@@ -19,5 +21,11 @@ impl Serialize for str {
 impl Serialize for String {
     fn serialize(&self, buf: &mut Vec<u8>) {
         self.as_str().serialize(buf)
+    }
+}
+
+impl Serialize for PathBuf {
+    fn serialize(&self, buf: &mut Vec<u8>) {
+        self.to_str().unwrap_or_default().serialize(buf);
     }
 }

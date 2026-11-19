@@ -112,11 +112,7 @@ impl Payload for ConfigMeta {
         for normspace in self.normspaces.iter() {
             normspace.id.serialize(&mut result);
             normspace.name.serialize(&mut result);
-
-            let path = normspace.path.to_str().unwrap_or_default();
-            let path_size = path.len() as u16;
-            result.append(&mut path_size.to_le_bytes().to_vec());
-            result.append(&mut path.as_bytes().to_vec());
+            normspace.path.serialize(&mut result);
         }
 
         result

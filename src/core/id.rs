@@ -13,11 +13,11 @@ pub type Id32 = Id<u32>;
 pub type Id64 = Id<u64>;
 
 impl<T: Unsigned + Copy + CheckedAdd + One> Id<T> {
-    pub fn new(value: T) -> Self {
-        Self(value)
+    pub fn new(inner: T) -> Self {
+        Self(inner)
     }
 
-    pub fn get(&self) -> T {
+    pub fn into_inner(&self) -> T {
         self.0
     }
 

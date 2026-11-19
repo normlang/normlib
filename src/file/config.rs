@@ -76,7 +76,7 @@ impl Config {
 
     pub fn new_normspace(&mut self, name: &str, dir: &Path) -> io::Result<Id16> {
         let id = self.metadata.next_id().ok_or(io::ErrorKind::InvalidData)?;
-        let file_name = format!("ns!{:04X}", id.get());
+        let file_name = format!("ns!{:04X}", id.into_inner());
         let path = dir.join(file_name);
         fs::create_dir(&path)?;
 

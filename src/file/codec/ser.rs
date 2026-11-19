@@ -29,3 +29,14 @@ impl Serialize for PathBuf {
         self.to_str().unwrap_or_default().serialize(buf);
     }
 }
+
+impl<T: Serialize> Serialize for Vec<T> {
+    fn serialize(&self, buf: &mut Vec<u8>) {
+        let size = self.len() as u16;
+        buf.append(&mut size.to_le_bytes().to_vec());
+
+        for elem in self.iter() {
+            elem.serialize(buf);
+        }
+    }
+}

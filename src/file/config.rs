@@ -106,15 +106,7 @@ impl Payload for ConfigMeta {
 
     fn serialize(&self) -> Vec<u8> {
         let mut result: Vec<u8> = Vec::new();
-        let size = self.normspaces.len() as u16;
-        result.append(&mut size.to_le_bytes().to_vec());
-
-        for normspace in self.normspaces.iter() {
-            normspace.id.serialize(&mut result);
-            normspace.name.serialize(&mut result);
-            normspace.path.serialize(&mut result);
-        }
-
+        self.normspaces.serialize(&mut result);
         result
     }
 
@@ -155,5 +147,13 @@ impl Payload for ConfigMeta {
         }
 
         Ok(ConfigMeta { normspaces })
+    }
+}
+
+impl Serialize for NormspaceMeta {
+    fn serialize(&self, buf: &mut Vec<u8>) {
+        self.id.serialize(buf);
+        self.name.serialize(buf);
+        self.path.serialize(buf);
     }
 }
